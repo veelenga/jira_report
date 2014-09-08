@@ -2,6 +2,7 @@ require 'rest_client'
 require 'json'
 require 'uri'
 require 'inifile'
+require 'optparse'
 
 class WeeklyReport
 
@@ -49,6 +50,7 @@ class WeeklyReport
   def closed(time)
     search_issues("jql='First Closed Date'>=#{time} AND 'First Closed User' in (#{@username})")
   end
+
   private 
   def reopened(time)
     search_issues("jql='First Reopened Date'>=#{time} AND 'First Reopened User' in (#{@username})")
@@ -71,14 +73,42 @@ class WeeklyReport
   end
 end
 
-settings = IniFile.load('settings.ini')
-if not settings
-  raise RuntimeError("File 'settings.ini' to initialize properties not found")
-end
-username = settings['jira']['username']
-password = settings['jira']['password']
-url      = settings['jira']['url']
 
-search_url = "http://#{username}:#{password}@#{url}/rest/api/2/search?"
-r = WeeklyReport.new(search_url, 'veelenga')
-r.weekly_report
+class CmdUtils
+  def read_input_parameters
+    options = {}
+    OptionParser.new do |opts|
+      opts.banner = "Usage: weekly_report.rb [options]"
+      opts.on("-u", "--username username", "Username to get weekly jira statistic on") do |username|
+        options[:username] = username
+      end
+      opts.on("-s", "--settings path_to_settings",
+              "Specifies path to your settings file. Not mandatory. settings.ini used by default") do |file_path|
+        options[:file_path] = file_path
+      end
+    end.parse!
+
+    raise OptionParser::MissingArgument, 'username should be specified' if options[:username].nil?
+    options
+  end
+end
+
+options = CmdUtils.new.read_input_parameters
+
+username = options[:username]
+if options[:file_path]
+  file_with_settings = options[:file_path]
+else
+  file_with_settings = 'settings.ini'
+end
+
+settings = IniFile.load(file_with_settings)
+if not settings
+  raise RuntimeError, "File #{file_with_settings} to initialize properties not found"
+end
+
+jusername = settings['jira']['username']
+jpassword = settings['jira']['password']
+jurl      = settings['jira']['url']
+
+WeeklyReport.new("http://#{jusername}:#{jpassword}@#{jurl}/rest/api/2/search?", "#{username}").weekly_report
