@@ -14,7 +14,7 @@ default
 ```
 
 Output example:
-```sh
+```txt
 $ruby weekly_report.rb -u admin
 Querying jira...
 Last week activities report in Jira for [admin]:
