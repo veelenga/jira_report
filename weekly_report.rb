@@ -1,6 +1,7 @@
 require 'rest_client'
 require 'json'
 require 'uri'
+require 'inifile'
 
 class WeeklyReport
 
@@ -70,6 +71,14 @@ class WeeklyReport
   end
 end
 
-search_url = "http://#{username}:#{password}@#{jira_url}/rest/api/2/search?"
-r = WeeklyReport.new(search_url, 'sposashk')
+settings = IniFile.load('settings.ini')
+if not settings
+  raise RuntimeError("File 'settings.ini' to initialize properties not found")
+end
+username = settings['jira']['username']
+password = settings['jira']['password']
+url      = settings['jira']['url']
+
+search_url = "http://#{username}:#{password}@#{url}/rest/api/2/search?"
+r = WeeklyReport.new(search_url, 'veelenga')
 r.weekly_report
