@@ -14,7 +14,7 @@ class WeeklyReport
   end
 
   def weekly_report
-    puts "Quering jira..."
+    puts "Querying jira..."
 
     weekly_created = created('-1w')
     weekly_resolved = resolved('-1w')
