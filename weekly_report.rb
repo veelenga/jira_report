@@ -13,7 +13,7 @@ class WeeklyReport
     @username = username
   end
 
-  def weekly_report
+  def report
     puts 'Querying jira...'
 
     weekly_created = created('-1w')
@@ -135,4 +135,4 @@ end
 parameters = CmdUtils.new
 settings = Settings.new(parameters.ini)
 
-WeeklyReport.new(settings.jira_search_url, parameters.username).weekly_report
+WeeklyReport.new(settings.jira_search_url, parameters.username).report
