@@ -4,39 +4,43 @@ require 'uri'
 require 'inifile'
 require 'optparse'
 
-# Generates weekly report based on activities in jira
-class WeeklyReport
-  attr_reader :search_url, :username
-
-  def initialize(search_url, username)
-    @search_url = search_url
+# Generates report based on activities in jira
+class JiraReport
+  def initialize(init_set, username)
     @username = username
+    @search_url = jira_search_url(init_set.jurl,
+                                  init_set.jusername,
+                                  init_set.jpassword)
   end
 
-  def report
-    puts 'Querying jira...'
-
-    weekly_created = created('-1w')
-    weekly_resolved = resolved('-1w')
-    weekly_reopened = reopened('-1w')
-    weekly_closed = closed('-1w')
+  def weekly
+    report = report('-1w')
 
     puts "Last week activities report in Jira for [#{@username}]:"
 
-    puts "\nCreated: #{weekly_created.length}"
-    print_issues(weekly_created)
+    puts "\nCreated: #{report[0].length}"
+    print_issues(report[0])
 
-    puts "\nResolved: #{weekly_resolved.length}"
-    print_issues(weekly_resolved)
+    puts "\nResolved: #{report[1].length}"
+    print_issues(report[1])
 
-    puts "\nReopened: #{weekly_reopened.length}"
-    print_issues(weekly_reopened)
+    puts "\nReopened: #{report[2].length}"
+    print_issues(report[2])
 
-    puts "\nClosed: #{weekly_closed.length}"
-    print_issues(weekly_closed)
+    puts "\nClosed: #{report[3].length}"
+    print_issues(report[3])
+  end
+
+  def report(time)
+    puts 'Querying jira...'
+    [created(time), resolved(time), reopened(time), closed(time)]
   end
 
   private
+
+  def jira_search_url(url, username, password)
+    "http://#{username}:#{password}@#{url}/rest/api/2/search?"
+  end
 
   def created(time)
     search_issues("jql=created>=#{time} AND reporter in (#{@username})")
@@ -70,13 +74,14 @@ class WeeklyReport
   end
 end
 
-# Prepares input parameters using OptionParser
-class CmdUtils
+# Prepares commad line parameters using OptionParser
+class ClParameters
   attr_reader :username, :ini
 
   def initialize
     options = parse
-    fail OptionParser::MissingArgument, 'Specify username' unless options[:username]
+    fail OptionParser::MissingArgument, 'Specify -u username' \
+      unless options[:username]
     @username = options[:username]
     @ini = options[:ini] ? options[:ini] : 'settings.ini'
   end
@@ -99,13 +104,13 @@ class CmdUtils
   end
 end
 
-# Reads initialize settings from init file
+# Reads settings from init file
 class Settings
-  attr_reader :jira_search_url
+  attr_reader :jusername, :jpassword, :jurl
 
   def initialize(path)
     settings = read(path)
-    @jira_search_url = parse(settings)
+    parse(settings)
   end
 
   private
@@ -120,19 +125,15 @@ class Settings
     jira = settings['jira']
     fail "Init file hasn't [jira] section!" unless jira
 
-    jusername = jira['username']
-    jpassword = jira['password']
-    jurl      = jira['url']
+    @jusername = jira['username']
+    @jpassword = jira['password']
+    @jurl      = jira['url']
 
     fail "Init file hasn't username option!" unless jusername
     fail "Init file hasn't password option!" unless jpassword
     fail "Init file hasn't url option!" unless jurl
-
-    "http://#{jusername}:#{jpassword}@#{jurl}/rest/api/2/search?"
   end
 end
 
-parameters = CmdUtils.new
-settings = Settings.new(parameters.ini)
-
-WeeklyReport.new(settings.jira_search_url, parameters.username).report
+parameters = ClParameters.new
+JiraReport.new(Settings.new(parameters.ini), parameters.username).weekly
