@@ -7,8 +7,8 @@ Usage:
 ```sh
 $ruby weekly_report.rb -h
 Usage: weekly_report.rb [options]
-    -u, --username username          Username to get weekly jira statistic on
-    -s, --settings path_to_settings  Specifies path to your settings file. Not mandatory. settings.ini used by
+    -u, --username username          Username to query statistic
+    -s, --settings ini               Path to init file. settings.ini will be used if not specified
 default
 
 ```
