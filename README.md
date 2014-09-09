@@ -1,7 +1,7 @@
 Jira weekly report
 ===========================
 
-Simple tools that generates jira weekly report. Report sample see below.
+Simple tool that generates jira weekly report. Report sample see below.
 
 Usage:
 ```sh
