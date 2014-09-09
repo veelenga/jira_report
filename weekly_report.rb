@@ -4,8 +4,8 @@ require 'uri'
 require 'inifile'
 require 'optparse'
 
+# Generates weekly report based on activities in jira
 class WeeklyReport
-
   attr_reader :search_url, :username
 
   def initialize(search_url, username)
@@ -14,7 +14,7 @@ class WeeklyReport
   end
 
   def weekly_report
-    puts "Querying jira..."
+    puts 'Querying jira...'
 
     weekly_created = created('-1w')
     weekly_resolved = resolved('-1w')
@@ -37,35 +37,32 @@ class WeeklyReport
   end
 
   private
+
   def created(time)
     search_issues("jql=created>=#{time} AND reporter in (#{@username})")
   end
 
-  private
   def resolved(time)
-    search_issues("jql=resolved>=#{time} AND 'First Resolution User' in (#{@username})")
+    search_issues("jql=resolved>=#{time} AND " \
+                  "'First Resolution User' in (#{@username})")
   end
 
-  private 
   def closed(time)
-    search_issues("jql='First Closed Date'>=#{time} AND 'First Closed User' in (#{@username})")
+    search_issues("jql='First Closed Date'>=#{time} " \
+                  "AND 'First Closed User' in (#{@username})")
   end
 
-  private 
   def reopened(time)
-    search_issues("jql='First Reopened Date'>=#{time} AND 'First Reopened User' in (#{@username})")
+    search_issues("jql='First Reopened Date'>=#{time} " \
+                  "AND 'First Reopened User' in (#{@username})")
   end
 
-  private
   def search_issues(filter)
     response = RestClient.get(@search_url + URI.escape(filter))
-    if(response.code != 200)
-      raise "Error with the http request!"
-    end
-    data = JSON.parse(response.body)['issues']
+    fail "Response code #{response.code}" unless response.code == 200
+    JSON.parse(response.body)['issues']
   end
 
-  private
   def print_issues(issues)
     issues.each do |issue|
       puts "  #{issue['key']} - #{issue['fields']['summary']}"
@@ -73,42 +70,69 @@ class WeeklyReport
   end
 end
 
-
+# Prepares input parameters using OptionParser
 class CmdUtils
-  def read_input_parameters
+  attr_reader :username, :ini
+
+  def initialize
+    options = parse
+    fail OptionParser::MissingArgument, 'Specify username' unless options[:username]
+    @username = options[:username]
+    @ini = options[:ini] ? options[:ini] : 'settings.ini'
+  end
+
+  private
+
+  def parse
     options = {}
     OptionParser.new do |opts|
-      opts.banner = "Usage: weekly_report.rb [options]"
-      opts.on("-u", "--username username", "Username to get weekly jira statistic on") do |username|
-        options[:username] = username
+      opts.banner = 'Usage: weekly_report.rb [options]'
+      opts.on('-u', '--username username', 'Username to query statistic') do |u|
+        options[:username] = u
       end
-      opts.on("-s", "--settings path_to_settings",
-              "Specifies path to your settings file. Not mandatory. settings.ini used by default") do |file_path|
-        options[:file_path] = file_path
+      opts.on('-s', '--settings ini', 'Path to init file. ' \
+              'settings.ini will be used if not specified') do |s|
+        options[:ini] = s
       end
     end.parse!
-
-    raise OptionParser::MissingArgument, 'username should be specified' if options[:username].nil?
     options
   end
 end
 
-options = CmdUtils.new.read_input_parameters
+# Reads initialize settings from init file
+class Settings
+  attr_reader :jira_search_url
 
-username = options[:username]
-if options[:file_path]
-  file_with_settings = options[:file_path]
-else
-  file_with_settings = 'settings.ini'
+  def initialize(path)
+    settings = read(path)
+    @jira_search_url = parse(settings)
+  end
+
+  private
+
+  def read(path)
+    settings = IniFile.load(path)
+    fail "File #{path} not found!" unless settings
+    settings
+  end
+
+  def parse(settings)
+    jira = settings['jira']
+    fail "Init file hasn't [jira] section!" unless jira
+
+    jusername = jira['username']
+    jpassword = jira['password']
+    jurl      = jira['url']
+
+    fail "Init file hasn't username option!" unless jusername
+    fail "Init file hasn't password option!" unless jpassword
+    fail "Init file hasn't url option!" unless jurl
+
+    "http://#{jusername}:#{jpassword}@#{jurl}/rest/api/2/search?"
+  end
 end
 
-settings = IniFile.load(file_with_settings)
-if not settings
-  raise RuntimeError, "File #{file_with_settings} to initialize properties not found"
-end
+parameters = CmdUtils.new
+settings = Settings.new(parameters.ini)
 
-jusername = settings['jira']['username']
-jpassword = settings['jira']['password']
-jurl      = settings['jira']['url']
-
-WeeklyReport.new("http://#{jusername}:#{jpassword}@#{jurl}/rest/api/2/search?", "#{username}").weekly_report
+WeeklyReport.new(settings.jira_search_url, parameters.username).weekly_report
