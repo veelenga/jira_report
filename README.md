@@ -1,21 +1,24 @@
-Jira weekly report
+Jira report
 ===========================
 
-Simple tool that generates jira weekly report. Report sample see below.
+Generates a productivity report. Example of report see below.
 
-Usage:
+##Installation:
+```
+gem install jira-report
+```
+
+##Usage:
 ```sh
-$ruby weekly_report.rb -h
-Usage: weekly_report.rb [options]
+$jira-report -h
+Usage: jira-report [options]
     -u, --username username          Username to query statistic
-    -s, --settings ini               Path to init file. settings.ini will be used if not specified
-default
-
+    -s, --settings ini               Path to init file. .jira-report is default
 ```
 
 Output example:
 ```
-$ruby weekly_report.rb -u admin
+$jira-report -u admin
 Querying jira...
 Last week activities report in Jira for [admin]:
 
@@ -43,7 +46,8 @@ Closed: 9
   GSM-364 -  Migration of existing scenario
 ```
 
-For initialization settings.ini file is required. Example of settings.ini
+##Configuration:
+Example of configuration file `.jira-report`:
 ```ini
 [jira]
 username=username
