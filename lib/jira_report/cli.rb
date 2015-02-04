@@ -10,7 +10,7 @@ module JiraReport
       fail OptionParser::MissingArgument, 'Specify -u username' \
         unless options[:username]
       @username = options[:username]
-      @ini = options[:ini] ? options[:ini] : "#{ENV['HOME']}/.jira-report"
+      @ini = options[:ini] ? options[:ini] : "~/.jira-report"
     end
 
     private

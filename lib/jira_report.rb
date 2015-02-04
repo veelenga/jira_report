@@ -5,37 +5,42 @@ require 'uri'
 require 'jira_report/settings'
 require 'jira_report/cli'
 
-# Generates report based on activities in jira
 module JiraReport
+  # Base class that generate jira activity report
   class JiraReport
+    attr_accessor :from, :till, :username
+
     def initialize(init_set, username)
       @username = username
       @search_url = jira_search_url(init_set.url,
                                     init_set.username,
                                     init_set.password)
+
+      @from = init_set.period_from.gsub(/'/, '')
+      @till = init_set.period_till.gsub(/'/, '')
     end
 
-    def weekly
-      report = report('-1w')
+    def report
+      puts "Querying jira..."
 
-      puts "Last week activities report in Jira for [#{@username}]:"
+      created = query(jql_created)
+      resolved = query(jql_resolved)
+      reopened = query(jql_reopened)
+      closed = query(jql_closed)
 
-      puts "\nCreated: #{report[0].length}"
-      print_issues(report[0])
+      puts "\nJira activity report for [#{@username}]:"
 
-      puts "\nResolved: #{report[1].length}"
-      print_issues(report[1])
+      puts "\nCreated: #{created.length}"
+      print_issues(created)
 
-      puts "\nReopened: #{report[2].length}"
-      print_issues(report[2])
+      puts "\nResolved: #{resolved.length}"
+      print_issues(resolved)
 
-      puts "\nClosed: #{report[3].length}"
-      print_issues(report[3])
-    end
+      puts "\nReopened: #{reopened.length}"
+      print_issues(reopened)
 
-    def report(time)
-      puts 'Querying jira...'
-      [created(time), resolved(time), reopened(time), closed(time)]
+      puts "\nClosed: #{closed.length}"
+      print_issues(closed)
     end
 
     private
@@ -44,28 +49,34 @@ module JiraReport
       "http://#{username}:#{password}@#{url}/rest/api/2/search?"
     end
 
-    def created(time)
-      search_issues("jql=created>=#{time} AND reporter in (#{@username})")
+    def jql_created
+      "jql=created>=#{@from} "  \
+        "AND created<=#{@till} "\
+        "AND reporter=#{@username}"
     end
 
-    def resolved(time)
-      search_issues("jql=resolved>=#{time} AND " \
-                    "'First Resolution User' in (#{@username})")
+    def jql_resolved
+      "jql=resolved>=#{@from} "  \
+        "AND resolved<=#{@till} "\
+        "AND 'First Resolution User'=#{@username}"
     end
 
-    def closed(time)
-      search_issues("jql='First Closed Date'>=#{time} " \
-                    "AND 'First Closed User' in (#{@username})")
+    def jql_closed
+      "jql='First Closed Date'>=#{@from} "  \
+        "AND 'First Closed Date'<=#{@till} "\
+        "AND 'First Closed User'=#{@username}"
     end
 
-    def reopened(time)
-      search_issues("jql='First Reopened Date'>=#{time} " \
-                    "AND 'First Reopened User' in (#{@username})")
+    def jql_reopened
+      "jql='First Reopened Date'>=#{@from} "  \
+        "AND 'First Reopened Date'<=#{@till} "\
+        "AND 'First Reopened User'=#{@username}"
     end
 
-    def search_issues(filter)
-      response = RestClient.get(@search_url + URI.escape(filter))
-      fail "Response code #{response.code}" unless response.code == 200
+    def query(jql)
+      response = RestClient.get(@search_url + URI.escape(jql))
+      fail "Query unsuccessful. Response code #{response.code}"\
+        unless response.code == 200
       JSON.parse(response.body)['issues']
     end
 
