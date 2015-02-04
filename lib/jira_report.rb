@@ -10,9 +10,9 @@ module JiraReport
   class JiraReport
     def initialize(init_set, username)
       @username = username
-      @search_url = jira_search_url(init_set.jurl,
-                                    init_set.jusername,
-                                    init_set.jpassword)
+      @search_url = jira_search_url(init_set.url,
+                                    init_set.username,
+                                    init_set.password)
     end
 
     def weekly

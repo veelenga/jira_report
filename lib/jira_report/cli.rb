@@ -1,7 +1,7 @@
 require 'optparse'
 
 module JiraReport
-  # Prepares commad line parameters using OptionParser
+  # Prepares command line parameters using OptionParser
   class Cli
     attr_reader :username, :ini
 
@@ -10,7 +10,7 @@ module JiraReport
       fail OptionParser::MissingArgument, 'Specify -u username' \
         unless options[:username]
       @username = options[:username]
-      @ini = options[:ini] ? options[:ini] : '.jira-report'
+      @ini = options[:ini] ? options[:ini] : "#{ENV['HOME']}/.jira-report"
     end
 
     private
@@ -19,11 +19,11 @@ module JiraReport
       options = {}
       OptionParser.new do |opts|
         opts.banner = 'Usage: jira-report [options]'
-        opts.on('-u', '--username username', 'Username to query statistic') do |u|
+        opts.on('-u', '--username username', 'Username to query activity report.') do |u|
           options[:username] = u
         end
         opts.on('-s', '--settings ini', 'Path to init file. ' \
-                '~USER_HOME/.jira-report is default.') do |s|
+                'USER_HOME/.jira-report is default.') do |s|
           options[:ini] = s
         end
       end.parse!

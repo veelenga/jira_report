@@ -1,34 +1,46 @@
 require 'inifile'
+require 'io/console'
 
-# Reads settings from init file
+# Initializes JiraReport settings.
 module JiraReport
   class Settings
-    attr_reader :jusername, :jpassword, :jurl
+    attr_reader :username, :password, :url,\
+      :period_from, :period_till
 
     def initialize(path)
-      settings = read(path)
-      parse(settings)
+      read(path)
     end
 
     private
 
     def read(path)
-      settings = IniFile.load(path)
-      fail "File #{path} not found!" unless settings
-      settings
+      loaded = IniFile.load(File.expand_path(path))
+
+      global = loaded[:global] if loaded
+      global ||= {}
+
+      @url = global['url']
+      @username = global['username']
+      @password = global['password']
+      @period_from = global['period_from']
+      @period_till = global['period_till']
+
+      @url = ask('Jira url: ') unless @url
+      @username = ask('Jira username: ') unless @username
+      @password = ask('Jira password: '){
+        STDIN.noecho(&:gets).chomp!
+      } unless @password
+      @period_from = '-1w' unless @period_from
+      @period_till = 'now()' unless @period_till
     end
 
-    def parse(settings)
-      jira = settings['jira']
-      fail "Init file hasn't [jira] section!" unless jira
-
-      @jusername = jira['username']
-      @jpassword = jira['password']
-      @jurl      = jira['url']
-
-      fail "Init file hasn't username option!" unless jusername
-      fail "Init file hasn't password option!" unless jpassword
-      fail "Init file hasn't url option!" unless jurl
+    def ask(message, &block)
+      print message
+      if block
+        yield block
+      else
+        gets.chomp!
+      end
     end
   end
 end
