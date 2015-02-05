@@ -21,7 +21,7 @@ module JiraReport
     end
 
     def report
-      puts "Querying jira..."
+      puts "\nQuerying jira..."
 
       created = query(jql_created)
       resolved = query(jql_resolved)

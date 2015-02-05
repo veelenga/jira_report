@@ -1,26 +1,32 @@
-Jira report
+jira_report
 ===========================
 
-Generates a productivity report. Example of report see below.
+Generates a productivity report(list of created/resolved/reopened/closed issues) for specified user and period of time.
 
-##Installation:
+Period is set by two options `period_from` and `period_till`. Both options support [advanced jira searching](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) and accept dates, jira functions, aliasing. For example:
+
+```
+period_from=-3w
+period_till=now()
+```
+
+##Installation
 ```
 gem install jira-report
 ```
 
-##Usage:
+##Usage
 ```sh
 $jira-report -h
 Usage: jira-report [options]
-    -u, --username username          Username to query statistic
-    -s, --settings ini               Path to init file. .jira-report is default
+    -u, --username username          Username to query activity report.
+    -s, --settings ini               Path to init file. USER_HOME/.jira-report is default.
 ```
 
-Output example:
 ```
 $jira-report -u admin
 Querying jira...
-Last week activities report in Jira for [admin]:
+Jira activity report for [admin]:
 
 Created: 5
   WFM-7180 - Provide static context for log property in BasicHashAnalyzer 
@@ -46,11 +52,5 @@ Closed: 9
   GSM-364 -  Migration of existing scenario
 ```
 
-##Configuration:
-Example of configuration file `.jira-report`:
-```ini
-[jira]
-username=username
-password=s3cr3t
-url=jira.company.com
-```
+##Configuration
+Default path to configuration file is `~/.jira-report`. All settings are optional and may be read from user input. See [sample](examples/jira-report.sample).
