@@ -1,0 +1,6 @@
+url=jira.company.com
+username=jira_username
+password=s3cr3t
+
+period_from=-1w
+period_till=now()

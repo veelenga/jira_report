@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'jira_report'
+
+parameters = JiraReport::Cli.new
+settings = JiraReport::Settings.new(parameters.ini)
+JiraReport::JiraReport.new(settings, parameters.username).report
