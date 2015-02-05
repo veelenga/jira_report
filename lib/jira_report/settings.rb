@@ -25,13 +25,15 @@ module JiraReport
       @period_from = global['period_from']
       @period_till = global['period_till']
 
-      @url = ask('Jira url: ') unless @url
+      @url = ask('Jira url in [jira.company.com] format: ') unless @url
       @username = ask('Jira username: ') unless @username
       @password = ask('Jira password: '){
         STDIN.noecho(&:gets).chomp!
       } unless @password
       @period_from = '-1w' unless @period_from
       @period_till = 'now()' unless @period_till
+
+      # TODO: attributes verification
     end
 
     def ask(message, &block)

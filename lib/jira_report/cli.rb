@@ -7,8 +7,6 @@ module JiraReport
 
     def initialize
       options = parse
-      fail OptionParser::MissingArgument, 'Specify -u username' \
-        unless options[:username]
       @username = options[:username]
       @ini = options[:ini] ? options[:ini] : "~/.jira-report"
     end
