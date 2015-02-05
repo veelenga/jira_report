@@ -1,7 +1,7 @@
 jira_report
 ===========================
 
-Generates a productivity report(lists of created, resolved, reopened and closed issues) for specified user and period of time.
+Queries user activities for specified period of time and prints it to console.
 
 ##Installation
 ```
