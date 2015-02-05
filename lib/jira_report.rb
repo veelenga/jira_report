@@ -11,13 +11,13 @@ module JiraReport
     attr_accessor :from, :till, :username
 
     def initialize(init_set, username)
-      @username = username ? username : init_set.username
+      @username = username ? username : 'currentUser()'
       @search_url = jira_search_url(init_set.url,
                                     init_set.username,
                                     init_set.password)
 
-      @from = init_set.period_from.gsub(/'/, '')
-      @till = init_set.period_till.gsub(/'/, '')
+      @from = init_set.period_from
+      @till = init_set.period_till
     end
 
     def report
