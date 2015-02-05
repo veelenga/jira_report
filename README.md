@@ -5,7 +5,7 @@ Generates a productivity report(lists of created, resolved, reopened and closed 
 
 ##Installation
 ```
-$gem install jira-report
+$gem install jira_report
 ```
 
 ##Usage
