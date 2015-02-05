@@ -20,7 +20,7 @@ module JiraReport
         opts.on('-u', '--username username', 'Username to query activity report.') do |u|
           options[:username] = u
         end
-        opts.on('-s', '--settings ini', 'Path to init file. ' \
+        opts.on('-c', '--config config', 'Path to config file. ' \
                 'USER_HOME/.jira-report is default.') do |s|
           options[:ini] = s
         end

@@ -1,18 +1,11 @@
 jira_report
 ===========================
 
-Generates a productivity report(list of created/resolved/reopened/closed issues) for specified user and period of time.
-
-Period is set by two options `period_from` and `period_till`. Both options support [advanced jira searching](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) and accept dates, jira functions, aliasing. For example:
-
-```
-period_from=-3w
-period_till=now()
-```
+Generates a productivity report(lists of created, resolved, reopened and closed issues) for specified user and period of time.
 
 ##Installation
 ```
-gem install jira-report
+$gem install jira-report
 ```
 
 ##Usage
@@ -20,7 +13,7 @@ gem install jira-report
 $jira-report -h
 Usage: jira-report [options]
     -u, --username username          Username to query activity report.
-    -s, --settings ini               Path to init file. USER_HOME/.jira-report is default.
+    -c, --config config              Path to config file. USER_HOME/.jira-report is default.
 ```
 
 ```
@@ -54,3 +47,10 @@ Closed: 5
 
 ##Configuration
 Default path to configuration file is `~/.jira-report`. All settings are optional and may be read from user input. See [sample](examples/jira-report.sample).
+
+Period is set by two options `period_from` and `period_till`. Both options support [advanced jira searching](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) and accept dates, jira functions, aliasing. For example:
+
+```
+period_from=-3w
+period_till=now()
+```
