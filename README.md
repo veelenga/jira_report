@@ -1,4 +1,7 @@
-jira_report
+[![Gem Version](https://badge.fury.io/rb/jira_report.svg)](https://rubygems.org/gems/jira_report)
+[![Build Status](https://api.travis-ci.org/veelenga/jira_report.svg)](https://travis-ci.org/veelenga/jira_report)
+
+Jira Report
 ===========================
 
 Queries user activities for specified period of time and prints it to console.
