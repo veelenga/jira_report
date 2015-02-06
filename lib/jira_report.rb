@@ -16,31 +16,38 @@ module JiraReport
                                     init_set.username,
                                     init_set.password)
 
-      @from = init_set.period_from.gsub(/'/, '')
-      @till = init_set.period_till.gsub(/'/, '')
+      @from = init_set.period_from
+      @till = init_set.period_till
     end
 
     def report
       puts "\nQuerying jira..."
 
-      created = query(jql_created)
-      resolved = query(jql_resolved)
-      reopened = query(jql_reopened)
-      closed = query(jql_closed)
+      begin
+        created = query(jql_created)
+        resolved = query(jql_resolved)
+        reopened = query(jql_reopened)
+        closed = query(jql_closed)
 
-      puts "\nJira activity report for [#{@username}]:"
+        puts "\nJira activity report for [#{@username}]:"
 
-      puts "\nCreated: #{created.length}"
-      print_issues(created)
+        puts "\nCreated: #{created.length}"
+        print_issues(created)
 
-      puts "\nResolved: #{resolved.length}"
-      print_issues(resolved)
+        puts "\nResolved: #{resolved.length}"
+        print_issues(resolved)
 
-      puts "\nReopened: #{reopened.length}"
-      print_issues(reopened)
+        puts "\nReopened: #{reopened.length}"
+        print_issues(reopened)
 
-      puts "\nClosed: #{closed.length}"
-      print_issues(closed)
+        puts "\nClosed: #{closed.length}"
+        print_issues(closed)
+
+      rescue SocketError => e
+        puts "Unable to connect to jira: '#{e.message}'"
+      rescue Exception => e
+        puts "Unable to prepare activity report: '#{e.message}'"
+      end
     end
 
     private
@@ -75,8 +82,9 @@ module JiraReport
 
     def query(jql)
       response = RestClient.get(@search_url + URI.escape(jql))
-      fail "Query unsuccessful. Response code #{response.code}"\
-        unless response.code == 200
+      unless response.code == 200
+        fail "Got wrong response code: #{response.code}"
+      end
       JSON.parse(response.body)['issues']
     end
 
