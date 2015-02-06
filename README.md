@@ -49,7 +49,7 @@ Closed: 5
 ```
 
 ##Configuration
-Default path to configuration file is `~/.jira-report`. All settings are optional and may be read from user input. See [sample](examples/jira-report.sample).
+Default path to configuration file is `~/.jira-report`. All settings are optional and may be read from user input. See [sample](example/jira-report.sample).
 
 Period is set by two options `period_from` and `period_till`. Both options support [advanced jira searching](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) and accept dates, jira functions, aliasing. For example:
 
