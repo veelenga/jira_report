@@ -37,6 +37,28 @@ module JiraReport
         end
       end
 
+      describe '#jql_*' do
+        describe '#jql_created' do
+          it 'returns query' do
+            expect(jrep.send(:jql_created)).not_to be nil
+          end
+        end
+        describe '#jql_resolved' do
+          it 'returns query' do
+            expect(jrep.send(:jql_resolved)).not_to be nil
+          end
+        end
+        describe '#jql_closed' do
+          it 'returns query' do
+            expect(jrep.send(:jql_closed)).not_to be nil
+          end
+        end
+        describe '#jql_reopened' do
+          it 'returns query' do
+            expect(jrep.send(:jql_reopened)).not_to be nil
+          end
+        end
+      end
     end
   end
 end

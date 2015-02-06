@@ -11,7 +11,7 @@ module JiraReport
     attr_accessor :from, :till, :username
 
     def initialize(init_set, username)
-      @username = username ? username : 'currentUser()'
+      @username = username ? username : init_set.username
       @search_url = jira_search_url(init_set.url,
                                     init_set.username,
                                     init_set.password)
