@@ -2,8 +2,8 @@ require 'rest_client'
 require 'json'
 require 'uri'
 
-require 'jira_report/settings'
 require 'jira_report/options'
+require 'jira_report/config_loader'
 
 module JiraReport
   # Base class that generate jira activity report
