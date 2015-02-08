@@ -13,10 +13,19 @@ module JiraReport
 
   # Parses and validates array of input arguments.
   class Options
-
+    # Accepts arguments to be parsed.
+    # Raises ArgumentError if args is not kind of Array.
     def initialize(args=ARGV)
+      unless args.kind_of? Array
+        raise ArgumentError.new "Array expected, but was #{args.class}"
+      end
       @options = {}
       parse(args)
+    end
+
+    # Returns clone of option hash
+    def options
+      @options.dup
     end
 
     # Returns option from option list with name that converted
@@ -48,6 +57,7 @@ module JiraReport
       end.parse!(args)
     end
 
+    # Adds new option.
     def option(opts, *args)
       opt_sym = long_opt_sym(*args)
       args << OptionsText::TEXT[opt_sym]
