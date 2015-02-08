@@ -3,7 +3,7 @@ require 'json'
 require 'uri'
 
 require 'jira_report/settings'
-require 'jira_report/cli'
+require 'jira_report/options'
 
 module JiraReport
   # Base class that generate jira activity report
