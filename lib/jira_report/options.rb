@@ -15,7 +15,7 @@ module JiraReport
   class Options
     # Accepts arguments to be parsed.
     # Raises ArgumentError if args is not kind of Array.
-    def initialize(args=ARGV)
+    def initialize(args)
       unless args.kind_of? Array
         raise ArgumentError.new "Array expected, but was #{args.class}"
       end
