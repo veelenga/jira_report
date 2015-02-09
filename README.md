@@ -41,7 +41,7 @@ Resolved: 8
 Reopened: 0
 
 Closed: 5
-  TST-6943 - Remove redundant org.apache.log4j dependcy from common part
+  TST-6943 - Remove redundant org.apache.log4j dependency from common part
   TST-5862 - Unable to install NGinx on HP-UX with Java 6
   TST-5857 - Put back support for Jdk 1.6
   TST-5840 - NGinx fails to handle interaction initiated
@@ -49,11 +49,21 @@ Closed: 5
 ```
 
 ##Configuration
-Default path to configuration file is `~/.jira-report`. All settings are optional and may be read from user input. See [sample](example/jira-report.sample).
+Path to configuration file can be specified by `-c` command line argument. `~/.jira-report` is default.
+
+There are three main options in config file to query jira:
+```
+url=jira.company.com
+username=username
+password=s3cr3t
+```
+all those are optional and if not specified will be asked from user input.
 
 Period is set by two options `period_from` and `period_till`. Both options support [advanced jira searching](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) and accept dates, jira functions, aliasing. For example:
-
 ```
 period_from=-3w
 period_till=now()
 ```
+If those options not specified in configuration file, last week activities will be queried.
+
+See full [sample](example/jira-report.sample) in repository.
