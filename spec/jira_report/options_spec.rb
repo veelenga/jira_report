@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'jira_report/options'
 
 module JiraReport
   describe Options do
