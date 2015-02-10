@@ -1,47 +1,13 @@
 require 'spec_helper'
 
 module JiraReport
-  class InitSet
-    attr_accessor :url,
-      :username, :password,
-      :period_from, :period_till
-
-    def initialize
-      @url = 'jira.company.com'
-      @username = 'admin'
-      @password = '*******'
-      @period_from = '10/11/2014'
-      @period_till = '10/12/2014'
-    end
-  end
-
   describe JiraReport do
-    let(:usr ) { 'JohnDoe' }
-    let(:init) { InitSet.new }
-    let(:jrep) { Reporter.new(init, usr) }
+    let(:jrep) { Reporter.new('url', 'admin', '*****') }
 
-    describe '#username' do
-      it 'should return username' do
-        expect(jrep.username).to eq usr
-      end
-    end
-
-    describe '#from' do
-      it 'should return from' do
-        expect(jrep.from).to eq init.period_from
-      end
-    end
-
-    describe '#till' do
-      it 'should return till' do
-        expect(jrep.till).to eq init.period_till
-      end
-    end
-
-    describe '#query' do
+    describe '#query_issues' do
       it 'should throw exception' do
         begin
-          jrep.send(:query, 'my_query')
+          jrep.query_issues('my_jql')
           fail
         rescue SocketError => e
           expect(e.message).not_to be nil
@@ -49,32 +15,35 @@ module JiraReport
       end
     end
 
-    describe '#jira_search_url' do
-      def jira_search_url(url=nil, user=nil, pass=nil)
-        jrep.send(:jira_search_url, url, user, pass)
+    describe '#jira_api_url' do
+      def jira_api_url(url=nil, user=nil, pass=nil)
+        jrep.send(:jira_api_url, url, user, pass)
       end
 
       it 'is an http url' do
-        url = jira_search_url
+        url = jira_api_url
         expect(url).not_to be nil
         expect(url).to start_with 'http'
       end
 
       it 'uses rest api' do
-        expect(jira_search_url).to include('rest/api/2/search')
+        expect(jira_api_url).to include('rest/api/2/search')
       end
 
-      context 'when we use url and username' do
+      context 'when we use url, username and password' do
         let(:usr) { 'admin_username' }
         let(:url) { 'jira.mycompany.url' }
-        it 'contains url and username' do
-          url = jira_search_url(url, usr, nil)
+        let(:pas) { '*****' }
+        it 'contains url, username and password' do
+          url = jira_api_url(url, usr, pas)
           expect(url).to include(url)
           expect(url).to include(usr)
+          expect(url).to include(pas)
         end
       end
     end
 
+=begin
     describe '#jql_*' do
       describe '#jql_created' do
         it 'returns query' do
@@ -97,5 +66,6 @@ module JiraReport
         end
       end
     end
+=end
   end
 end

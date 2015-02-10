@@ -3,81 +3,28 @@ require 'json'
 require 'uri'
 
 module JiraReport
-  # Base class that generate jira activity report
   class Reporter
-    attr_accessor :from, :till, :username
-
-    def initialize(init_set, username)
-      @username = username ? username : init_set.username
-      @search_url = jira_search_url(init_set.url,
-                                    init_set.username,
-                                    init_set.password)
-
-      @from = init_set.period_from
-      @till = init_set.period_till
+    def initialize(url, usr, pass)
+      @search_url = jira_api_url(url, usr, pass);
     end
 
-    def report
-      puts "\nQuerying jira..."
-
-      begin
-        created = query(jql_created)
-        resolved = query(jql_resolved)
-        reopened = query(jql_reopened)
-        closed = query(jql_closed)
-
-        puts "\nJira activity report for [#{@username}]:"
-
-        puts "\nCreated: #{created.length}"
-        print_issues(created)
-
-        puts "\nResolved: #{resolved.length}"
-        print_issues(resolved)
-
-        puts "\nReopened: #{reopened.length}"
-        print_issues(reopened)
-
-        puts "\nClosed: #{closed.length}"
-        print_issues(closed)
-
-      rescue SocketError => e
-        puts "Unable to connect to jira: '#{e.message}'"
-      rescue Exception => e
-        puts "Unable to prepare activity report: '#{e.message}'"
-      end
+    def created(usr, from=nil, till=nil)
+      query_issues(jql_created usr, from, till)
     end
 
-    private
-
-    def jira_search_url(url, username, password)
-      "http://#{username}:#{password}@#{url}/rest/api/2/search?"
+    def resolved(usr, from=nil, till=nil)
+      query_issues(jql_resolved usr, from, till)
     end
 
-    def jql_created
-      "jql=created>=#{@from} "  \
-        "AND created<=#{@till} "\
-        "AND reporter=#{@username}"
+    def reopened(usr, from=nil, till=nil)
+      query_issues(jql_reopened usr, from, till)
     end
 
-    def jql_resolved
-      "jql=resolved>=#{@from} "  \
-        "AND resolved<=#{@till} "\
-        "AND 'First Resolution User'=#{@username}"
+    def closed(usr, from=nil, till=nil)
+      query_issues(jql_closed usr, from, till)
     end
 
-    def jql_closed
-      "jql='First Closed Date'>=#{@from} "  \
-        "AND 'First Closed Date'<=#{@till} "\
-        "AND 'First Closed User'=#{@username}"
-    end
-
-    def jql_reopened
-      "jql='First Reopened Date'>=#{@from} "  \
-        "AND 'First Reopened Date'<=#{@till} "\
-        "AND 'First Reopened User'=#{@username}"
-    end
-
-    def query(jql)
+    def query_issues(jql)
       response = RestClient.get(@search_url + URI.escape(jql))
       unless response.code == 200
         fail "Got wrong response code: #{response.code}"
@@ -85,10 +32,47 @@ module JiraReport
       JSON.parse(response.body)['issues']
     end
 
-    def print_issues(issues)
-      issues.each do |issue|
-        puts "  #{issue['key']} - #{issue['fields']['summary']}"
-      end
+    private
+
+    # Returns jira rest api search url.
+    def jira_api_url(url, username, password)
+      "http://#{username}:#{password}@#{url}/rest/api/2/search?"
+    end
+
+    # Prepares jql query based on parameters to
+    # search created issues.
+    def jql_created(usr, from, till)
+      jql = 'jql='
+      jql << "created>=#{from} AND " if from
+      jql << "created<=#{till} AND " if till
+      jql << "reporter=#{username}"
+    end
+
+    # Prepares jql query based on parameters to
+    # search resolved issues.
+    def jql_resolved(usr, from, till)
+      jql = 'jql='
+      jql << "resolved>=#{from} AND " if from
+      jql << "resolved<=#{till} AND " if till
+      jql << "'First Resolution User'=#{username}"
+    end
+
+    # Prepares jql query based on parameters to
+    # search reopened issues.
+    def jql_reopened(usr, from, till)
+      jql = 'jql='
+      jql << "'First Reopened Date'>=#{from} AND " if from
+      jql << "'First Reopened Date'<=#{till} AND " if till
+      jql << "'First Reopened User'=#{username}"
+    end
+
+    # Prepares jql query based on parameters to
+    # search closed issues.
+    def jql_closed(usr, from, till)
+      jql = 'jql='
+      jql << "'First Closed Date'>=#{from} AND " if from
+      jql << "'First Closed Date'<=#{till} AND " if till
+      jql << "'First Closed User'=#{username}"
     end
   end
 end
