@@ -1,6 +1,6 @@
 require 'jira_report/options'
 require 'jira_report/config_loader'
-require 'jira_report'
+require 'jira_report/reporter'
 
 module JiraReport
   class Cli
@@ -14,11 +14,51 @@ module JiraReport
       ask_missing_options
       add_usr(options[:username])
 
-      JiraReport.new(@config)
-      #TODO: print report to console
+      report
     end
 
     private
+
+    def report
+      reporter = Reporter.new(
+        @config[:url], @config[:username], @config[:password]
+      )
+
+      puts "\nQuerying jira..."
+
+      created = reporter.created(
+        @config[:usr], @config[:period_from], @config[:period_till]
+      )
+      resolved = reporter.resolved(
+        @config[:usr], @config[:period_from], @config[:period_till]
+      )
+      reopened = reporter.reopened(
+        @config[:usr], @config[:period_from], @config[:period_till]
+      )
+      closed = reporter.closed(
+        @config[:usr], @config[:period_from], @config[:period_till]
+      )
+
+      puts "\nJira activity report for [#{@config[:usr]}]:"
+
+      puts "\nCreated: #{created.length}"
+      print_issues(created)
+
+      puts "\nResolved: #{resolved.length}"
+      print_issues(resolved)
+
+      puts "\nReopened: #{reopened.length}"
+      print_issues(reopened)
+
+      puts "\nClosed: #{closed.length}"
+      print_issues(closed)
+    end
+
+    def print_issues(issues)
+      issues.each do |issue|
+        puts "  #{issue['key']} - #{issue['fields']['summary']}"
+      end
+    end
 
     # Does required actions on specified option if needed.
     def act_on_option(options)
@@ -49,7 +89,7 @@ module JiraReport
       end
     end
 
-    # Asks user about
+    # Asks user to enter something
     def ask(message, &block)
       print message
       if block_given?
