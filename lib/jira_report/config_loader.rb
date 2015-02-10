@@ -5,7 +5,7 @@ module JiraReport
   class ConfigLoader
     def self.load_config(path)
       begin
-        return ParseConfig.new(File.exand_path(path))
+        ParseConfig.new(File.expand_path(path)).params
       rescue Exception => e
         raise RuntimeError.new "Error loading config: #{e}"
       end
