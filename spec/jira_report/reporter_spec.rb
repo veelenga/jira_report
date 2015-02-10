@@ -42,30 +42,140 @@ module JiraReport
         end
       end
     end
+  end
 
-=begin
-    describe '#jql_*' do
-      describe '#jql_created' do
-        it 'returns query' do
-          expect(jrep.send(:jql_created)).not_to be nil
-        end
-      end
-      describe '#jql_resolved' do
-        it 'returns query' do
-          expect(jrep.send(:jql_resolved)).not_to be nil
-        end
-      end
-      describe '#jql_closed' do
-        it 'returns query' do
-          expect(jrep.send(:jql_closed)).not_to be nil
-        end
-      end
-      describe '#jql_reopened' do
-        it 'returns query' do
-          expect(jrep.send(:jql_reopened)).not_to be nil
-        end
+  describe '#queries' do
+    let(:usr) { 'JohnDoe' }
+    let(:from) { '-3w' }
+    let(:till) { '-1w' }
+
+    mocked_rep = Reporter.new('url', 'usr', 'pas')
+
+    before(:example) do
+      allow(mocked_rep).to receive(:query_issues) do |arg|
+        arg
       end
     end
-=end
+
+    describe '#created' do
+      it 'has from, till and reporter' do
+        expect(mocked_rep.created(usr, from, till)).to eql(
+          "jql=created>=#{from} AND created<=#{till} AND reporter=#{usr}"
+        )
+      end
+      it 'has from and reporter' do
+        expect(mocked_rep.created(usr, from)).to eql(
+          "jql=created>=#{from} AND reporter=#{usr}"
+        )
+      end
+      it 'has till and reporter' do
+        expect(mocked_rep.created(usr, nil, till)).to eql(
+          "jql=created<=#{till} AND reporter=#{usr}"
+        )
+      end
+      it 'has only reporter' do
+        expect(mocked_rep.created(usr)).to eql(
+          "jql=reporter=#{usr}"
+        )
+      end
+      it 'has not parameters' do
+        expect(mocked_rep.created(nil)).to eql(
+          "jql=reporter="
+        )
+      end
+    end
+
+    describe '#resolved' do
+      it 'has from, till and reporter' do
+        expect(mocked_rep.resolved(usr, from, till)).to eql(
+          "jql=resolved>=#{from} AND resolved<=#{till} AND 'First Resolution User'=#{usr}"
+        )
+      end
+      it 'has from and reporter' do
+        expect(mocked_rep.resolved(usr, from)).to eql(
+          "jql=resolved>=#{from} AND 'First Resolution User'=#{usr}"
+        )
+      end
+      it 'has till and reporter' do
+        expect(mocked_rep.resolved(usr, nil, till)).to eql(
+          "jql=resolved<=#{till} AND 'First Resolution User'=#{usr}"
+        )
+      end
+      it 'has only reporter' do
+        expect(mocked_rep.resolved(usr)).to eql(
+          "jql='First Resolution User'=#{usr}"
+        )
+      end
+      it 'has not parameters' do
+        expect(mocked_rep.resolved(nil)).to eql(
+          "jql='First Resolution User'="
+        )
+      end
+    end
+
+    describe '#reopened' do
+      it 'has from, till and reporter' do
+        expect(mocked_rep.reopened(usr, from, till)).to eql(
+          "jql='First Reopened Date'>=#{from} "\
+          "AND 'First Reopened Date'<=#{till} "\
+          "AND 'First Reopened User'=#{usr}"
+        )
+      end
+      it 'has from and reporter' do
+        expect(mocked_rep.reopened(usr, from)).to eql(
+          "jql='First Reopened Date'>=#{from} "\
+          "AND 'First Reopened User'=#{usr}"
+        )
+      end
+      it 'has till and reporter' do
+        expect(mocked_rep.reopened(usr, nil, till)).to eql(
+          "jql='First Reopened Date'<=#{till} "\
+          "AND 'First Reopened User'=#{usr}"
+        )
+      end
+      it 'has only reporter' do
+        expect(mocked_rep.reopened(usr)).to eql(
+          "jql='First Reopened User'=#{usr}"
+        )
+      end
+      it 'has not parameters' do
+        expect(mocked_rep.reopened(nil)).to eql(
+          "jql='First Reopened User'="
+        )
+      end
+    end
+
+    describe '#closed' do
+      it 'has from, till and reporter' do
+        expect(mocked_rep.closed(usr, from, till)).to eql(
+          "jql='First Closed Date'>=#{from} "\
+          "AND 'First Closed Date'<=#{till} "\
+          "AND 'First Closed User'=#{usr}"
+        )
+      end
+      it 'has from and reporter' do
+        expect(mocked_rep.closed(usr, from)).to eql(
+          "jql='First Closed Date'>=#{from} "\
+          "AND 'First Closed User'=#{usr}"
+        )
+      end
+      it 'has till and reporter' do
+        expect(mocked_rep.closed(usr, nil, till)).to eql(
+          "jql='First Closed Date'<=#{till} "\
+          "AND 'First Closed User'=#{usr}"
+        )
+      end
+      it 'has only reporter' do
+        expect(mocked_rep.closed(usr)).to eql(
+          "jql='First Closed User'=#{usr}"
+        )
+      end
+      it 'has not parameters' do
+        expect(mocked_rep.closed(nil)).to eql(
+          "jql='First Closed User'="
+        )
+      end
+    end
   end
+
 end

@@ -36,7 +36,7 @@ module JiraReport
       it 'read file with options' do
         add_content(filename, "#{option}=#{value}")
         config = ConfigLoader.load_config(filename)
-        expect(config).to include(option => value)
+        expect(config).to include(option.to_sym => value)
       end
     end
   end
