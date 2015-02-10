@@ -38,8 +38,25 @@ module JiraReport
     # Reads required options from user input if those
     # were missed.
     def ask_missing_options
-      # TODO:
-      # update @config
+      @config[:url] = ask('Jira url:') unless @config[:url]
+      @config[:username] = ask('Jira username:') unless @config[:username]
+      @config[:password] = ask('Jira password:'){
+        STDIN.noecho(&:gets).chomp!
+      } unless @config[:password]
+      if !@config[:period_from] && !@config[:period_till]
+        @config[:period_from] = '-1w'
+        @config[:period_till] = 'now()'
+      end
+    end
+
+    # Asks user about
+    def ask(message, &block)
+      print message
+      if block_given?
+        yield block
+      else
+        gets.chomp!
+      end
     end
 
     # Adds to config username to query about.
