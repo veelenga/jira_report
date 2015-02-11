@@ -1,27 +1,23 @@
-[![Gem Version](https://badge.fury.io/rb/jira_report.svg)](https://rubygems.org/gems/jira_report)
-[![Build Status](https://api.travis-ci.org/veelenga/jira_report.svg)](https://travis-ci.org/veelenga/jira_report)
-
-Jira Report
+Jira Report [![Gem Version](https://badge.fury.io/rb/jira_report.svg)](https://rubygems.org/gems/jira_report) [![Build Status](https://api.travis-ci.org/veelenga/jira_report.svg)](https://travis-ci.org/veelenga/jira_report)
 ===========================
 
-Queries user activities for specified period of time and prints it to console.
+Queries user activities from jira for specified period of time and prints it to console.
 
 ##Installation
 ```
-$gem install jira_report
+$ gem install jira_report
 ```
 
 ##Usage
-```sh
-$jira-report -h
-Usage: jira-report [options]
-    -u, --username username          Username to query activity report.
-    -c, --config config              Path to config file. USER_HOME/.jira-report is default.
-```
 
+Just run it. `jira-report` will ask you your jira location, who you are and what's your password:
 ```
-$jira-report -u admin
+$ jira-report
+Jira url: jira.company.com
+Jira username: admin
+Jira password:
 Querying jira...
+
 Jira activity report for [admin]:
 
 Created: 2
@@ -48,6 +44,32 @@ Closed: 5
   GSM-364 -  Migration of existing units
 ```
 
+`url`, `username`, `password` and some other parameters can be added to [configuration file](#configuration). Also you can use mixed approach (keep some options in file, others enter from command line). For example if you do not want to keep password in configuration file, just don't, you will be asked.
+
+Also you can use it directly in ruby:
+```ruby
+require 'jira_report'
+
+def print_issues(issues)
+  issues.each do |issue|
+    puts "  #{issue['key']} - #{issue['fields']['summary']}"
+  end
+end
+
+reporter = JiraReport::Reporter.new('jira.company.com', 'admin', 's3cr3t')
+# returns all created issues by 'my_jira_name'
+all_created = reporter.created('my_jira_name')
+
+# returns closed issues by 'admin' last week
+weekly_closed = reporter.closed('admin', '-1w')
+
+# returns reopened issues by 'usr' in period starting
+# from two weeks ago and ending one week ago.
+reopened = reporter.reopened('usr', '-2w', '-1w')
+
+print_issues(weekly_closed)
+```
+
 ##Configuration
 Path to configuration file can be specified by `-c` command line argument. `~/.jira-report` is default.
 
@@ -57,13 +79,13 @@ url=jira.company.com
 username=username
 password=s3cr3t
 ```
-all those are optional and if not specified will be asked from user input.
+all those are optional and if not specified user will be asked to enter it from command line.
 
 Period is set by two options `period_from` and `period_till`. Both options support [advanced jira searching](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) and accept dates, jira functions, aliasing. For example:
 ```
-period_from=-3w
+period_from=-1w
 period_till=now()
 ```
-If those options not specified in configuration file, last week activities will be queried.
+If those options not specified in configuration file, last week activities will be queried (just as in example above).
 
-See full [sample](example/jira-report.sample) in repository.
+You can look at configuration file [sample](example/jira-report.sample) in repository.
