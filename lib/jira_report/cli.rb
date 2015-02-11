@@ -21,7 +21,7 @@ module JiraReport
 
         report
       rescue => e
-        puts "error: '#{e}'"
+        puts "error: '#{e.message}'"
         exit 1
       rescue SystemExit => e
         exit e.status
@@ -29,7 +29,7 @@ module JiraReport
         puts 'Interrupted'
         exit 130
       rescue Exception => e
-        puts "fatal: '#{e}'"
+        puts "fatal: '#{e.message}'"
         exit 255
       end
     end
