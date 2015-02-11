@@ -6,15 +6,30 @@ module JiraReport
   class Cli
     DEFAULT_CONFIG_PATH = '~/.jira-report'
 
+    def initialize
+      @config = {}
+    end
+
     def run(args=ARGV)
-      options = Options.new(args).options
-      act_on_option(options)
+      begin
+        options = Options.new(args).options
+        act_on_option(options)
 
-      load_config(options[:config])
-      ask_missing_options
-      add_usr(options[:username])
+        load_config(options[:config])
+        ask_missing_options
+        add_usr(options[:username])
 
-      report
+        report
+      rescue => e
+        puts "error: '#{e}'"
+        exit 1
+      rescue SystemExit, Interrupt => e
+        puts 'Interrupted'
+        exit 130
+      rescue Exception => e
+        puts "fatal: '#{e}'"
+        exit 255
+      end
     end
 
     private
@@ -106,7 +121,7 @@ module JiraReport
       else
         # use username for authentication if username
         # to query not specified.
-        @config[:usr] = config[:username]
+        @config[:usr] = @config[:username]
       end
     end
   end

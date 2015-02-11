@@ -8,8 +8,8 @@ module JiraReport
       it 'should throw exception' do
         begin
           jrep.query_issues('my_jql')
-          fail
-        rescue SocketError => e
+          fail Exception, 'exception expected'
+        rescue => e
           expect(e.message).not_to be nil
         end
       end

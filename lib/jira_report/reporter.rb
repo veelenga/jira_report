@@ -83,7 +83,7 @@ module JiraReport
     def query_issues(jql)
       response = RestClient.get(@search_url + URI.escape(jql))
       unless response.code == 200
-        fail "Got wrong response code: #{response.code}"
+        fail "Response code: #{response.code}"
       end
       JSON.parse(response.body)['issues']
     end
