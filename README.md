@@ -11,7 +11,7 @@ $ gem install jira_report
 ##Usage
 
 Just run it. `jira-report` will ask you your jira location, who you are and what's your password:
-```sh
+```
 $ jira-report
 Jira url: jira.company.com
 Jira username: admin
@@ -45,6 +45,30 @@ Closed: 5
 ```
 
 `url`, `username`, `password` and some other parameters can be added to [configuration file](#configuration). Also you can use mixed approach (keep some options in file, others enter from command line). For example if you do not want to keep password in configuration file, just don't, you will be asked.
+
+Also you can use it directly in ruby:
+```ruby
+require 'jira_report'
+
+def print_issues(issues)
+  issues.each do |issue|
+    puts "  #{issue['key']} - #{issue['fields']['summary']}"
+  end
+end
+
+reporter = JiraReport::Reporter.new('jira.company.com', 'admin', 's3cr3t')
+# returns all created issues by 'my_jira_name'
+all_created = reporter.created('my_jira_name')
+
+# returns closed issues by 'admin' last week
+weekly_closed = reporter.closed('admin', '-1w')
+
+# returns reopened issues by 'usr' in period starting
+# from two weeks ago and ending one week ago.
+reopened = reporter.reopened('usr', '-2w', '-1w')
+
+print_issues(weekly_closed)
+```
 
 ##Configuration
 Path to configuration file can be specified by `-c` command line argument. `~/.jira-report` is default.
