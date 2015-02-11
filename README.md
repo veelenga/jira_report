@@ -1,5 +1,4 @@
-Jira Report [![Gem Version](https://badge.fury.io/rb/jira_report.svg)](https://rubygems.org/gems/jira_report) [![Build Status](https://api.travis-ci.org/veelenga/jira_report.svg)](https://travis-ci.org/veelenga/jira_report)
-===========================
+#Jira Report [![Gem Version](https://badge.fury.io/rb/jira_report.svg)](https://rubygems.org/gems/jira_report) [![Build Status](https://api.travis-ci.org/veelenga/jira_report.svg)](https://travis-ci.org/veelenga/jira_report)
 
 Queries user activities from jira for specified period of time and prints it to console.
 
@@ -11,6 +10,7 @@ $ gem install jira_report
 ##Usage
 
 Just run it. `jira-report` will ask you your jira location, who you are and what's your password:
+
 ```
 $ jira-report
 Jira url: jira.company.com
@@ -47,6 +47,7 @@ Closed: 5
 `url`, `username`, `password` and some other parameters can be added to [configuration file](#configuration). Also you can use mixed approach (keep some options in file, others enter from command line). For example if you do not want to keep password in configuration file, just don't, you will be asked.
 
 Also you can use it directly in ruby:
+
 ```ruby
 require 'jira_report'
 
@@ -74,18 +75,22 @@ print_issues(weekly_closed)
 Path to configuration file can be specified by `-c` command line argument. `~/.jira-report` is default.
 
 There are three main options in config file to query jira:
+
 ```
 url=jira.company.com
 username=username
 password=s3cr3t
 ```
+
 all those are optional and if not specified user will be asked to enter it from command line.
 
 Period is set by two options `period_from` and `period_till`. Both options support [advanced jira searching](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) and accept dates, jira functions, aliasing. For example:
+
 ```
 period_from=-1w
 period_till=now()
 ```
+
 If those options not specified in configuration file, last week activities will be queried (just as in example above).
 
 You can look at configuration file [sample](example/jira-report.sample) in repository.
