@@ -23,7 +23,9 @@ module JiraReport
       rescue => e
         puts "error: '#{e}'"
         exit 1
-      rescue SystemExit, Interrupt => e
+      rescue SystemExit => e
+        exit e.status
+      rescue Interrupt => e
         puts 'Interrupted'
         exit 130
       rescue Exception => e
