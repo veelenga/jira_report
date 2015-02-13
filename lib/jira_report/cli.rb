@@ -90,7 +90,12 @@ module JiraReport
     # Loads configuration from configuration file.
     def load_config(path)
       config_path = path ? path : DEFAULT_CONFIG_PATH
-      @config = ConfigLoader.load_config(config_path)
+      begin
+        @config = ConfigLoader.load_config(config_path)
+      rescue => e
+        # Config not loaded from configuration file.
+        # Ignore it.
+      end
     end
 
     # Reads required options from user input if those
