@@ -1,6 +1,7 @@
 require 'jira_report/options'
 require 'jira_report/config_loader'
 require 'jira_report/reporter'
+require 'jira_report/version'
 require 'io/console'
 
 module JiraReport
