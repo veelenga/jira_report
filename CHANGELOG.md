@@ -1,3 +1,8 @@
+#0.1.3
+ * Fixed error when configuration file not exist.
+ * Now version is properly printed.
+ * User can enter password from command line with ruby 2.0 or earlier.
+
 #0.1.2
  * README updates to be parsed with Yard.
 
