@@ -9,7 +9,7 @@ $ gem install jira_report
 
 ##Usage
 
-Just run it. `jira-report` will ask you your jira location, who you are and what's your password:
+Just run it. `jira-report` will ask your jira site address, who you are and what's your password:
 
 ```
 $ jira-report
@@ -46,7 +46,7 @@ Closed: 5
 
 `url`, `username`, `password` and some other parameters can be added to [configuration file](#configuration). Also you can use mixed approach (keep some options in file, others enter from command line). For example if you do not want to keep password in configuration file, just don't, you will be asked.
 
-Also you can use it directly in ruby:
+Also you can use it directly in ruby code:
 
 ```ruby
 require 'jira_report'
@@ -82,7 +82,7 @@ username=username
 password=s3cr3t
 ```
 
-all those are optional and if not specified user will be asked to enter it from command line.
+You may pass all those options (or some of them) in command line mode.
 
 Period is set by two options `period_from` and `period_till`. Both options support [advanced jira searching](https://confluence.atlassian.com/display/JIRA/Advanced+Searching) and accept dates, jira functions, aliasing. For example:
 
