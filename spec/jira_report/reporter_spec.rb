@@ -4,6 +4,18 @@ module JiraReport
   describe JiraReport do
     let(:jrep) { Reporter.new('site', 'admin', '*****') }
 
+    describe '#new' do
+      it 'raises error if site is nil' do
+        expect{ Reporter.new(nil, '1', '2') }.to raise_error RuntimeError
+      end
+      it 'raises error if usr is nil' do
+        expect{ Reporter.new('mysite', nil, '2') }.to raise_error RuntimeError
+      end
+      it 'raises error if pas is nil' do
+        expect{ Reporter.new('mysite', 'usr', nil) }.to raise_error RuntimeError
+      end
+    end
+
     describe '#query_issues' do
       it 'should throw exception' do
         begin
@@ -48,12 +60,22 @@ module JiraReport
         let(:port)   {  8000 }
         let(:path)   { 'myjira' }
 
-        it 'is correctly prepares http url' do
-          site = "http://#{host}:#{port}/#{path}"
+        def expected_url(prefix)
+          "#{prefix}#{usr}:#{pas}@#{host}:#{port}/#{path}/#{Reporter::REST_API_SEARCH_URL}"
+        end
+
+        ['http://', 'https://'].each do |prefix|
+          it "correctly prepares #{prefix} url" do
+            site = "#{prefix}#{host}:#{port}/#{path}"
+            url = jira_api_url(site, usr, pas)
+            expect(url).to eq ( expected_url prefix )
+          end
+        end
+
+        it 'correctly prepares url without scheme' do
+          site = "#{host}:#{port}/#{path}"
           url = jira_api_url(site, usr, pas)
-          expect(url).to eq (
-            "http://#{usr}:#{pas}@#{host}:#{port}/#{path}/#{Reporter::REST_API_SEARCH_URL}"
-          )
+          expect(url).to eq ( expected_url 'http://' )
         end
       end
     end
@@ -192,5 +214,4 @@ module JiraReport
       end
     end
   end
-
 end

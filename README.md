@@ -13,12 +13,12 @@ Just run it. `jira-report` will ask you your jira location, who you are and what
 
 ```
 $ jira-report
-Jira url: jira.company.com
-Jira username: admin
-Jira password:
-Querying jira...
+Jira site address: https://jira.company.com
+Username for 'https://jira.company.com': admin
+Password for 'https://jira.company.com':
+Connecting to 'https://jira.company.com'. Pls wait...
 
-Jira activity report for [admin]:
+What was [admin] doing:
 
 Created: 2
   WFM-7180 - Provide static context for log property in BasicHashAnalyzer

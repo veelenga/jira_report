@@ -43,7 +43,7 @@ module JiraReport
         @config[:url], @config[:username], @config[:password]
       )
 
-      puts "\nQuerying jira..."
+      puts "\nConnecting to '#{@config[:url]}'. Pls wait..."
 
       created = reporter.created(
         @config[:usr], @config[:period_from], @config[:period_till]
@@ -58,7 +58,7 @@ module JiraReport
         @config[:usr], @config[:period_from], @config[:period_till]
       )
 
-      puts "\nJira activity report for [#{@config[:usr]}]:"
+      puts "\nWhat was [#{@config[:usr]}] doing:"
 
       puts "\nCreated: #{created.length}"
       print_issues(created)
@@ -102,9 +102,9 @@ module JiraReport
     # Reads required options from user input if those
     # were missed.
     def ask_missing_options
-      @config[:url] = ask('Jira url: ') unless @config[:url]
-      @config[:username] = ask('Jira username: ') unless @config[:username]
-      @config[:password] = ask('Jira password: '){
+      @config[:url] = ask('Jira site address: ') unless @config[:url]
+      @config[:username] = ask("Username for '#{@config[:url]}': ") unless @config[:username]
+      @config[:password] = ask("Password for '#{@config[:url]}': "){
         STDIN.noecho(&:gets).chomp!
       } unless @config[:password]
       if !@config[:period_from] && !@config[:period_till]

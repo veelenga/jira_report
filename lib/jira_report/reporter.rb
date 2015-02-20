@@ -26,11 +26,15 @@ module JiraReport
     #
     # ==== Attributes
     #
-    # * +url+ - jira URL in `jira.company.com` format.
+    # * +site+ - jira site address.
     # * +usr+ - jira username.
     # * +pass+ - jira password.
-    def initialize(url, usr, pass)
-      @search_url = jira_api_url(url, usr, pass);
+    def initialize(site, usr, pass)
+      fail 'url can\'t be nil' unless site
+      fail 'usr can\'t be nil' unless usr
+      fail 'pass can\'t be nil' unless pass
+
+      @search_url = jira_api_url(site, usr, pass);
     end
 
     # Queries created issues by usr in specified period.
@@ -92,15 +96,28 @@ module JiraReport
 
     private
 
-    # Returns jira rest api search url in next format
+    # Returns jira full rest api search url
     def jira_api_url(site, username, password)
-      u = URI.parse(site)
+      url = format_url(site, username, password)
+      "#{url}/#{REST_API_SEARCH_URL}"
+    end
+
+    # Formats url in the following format:
+    #  scheme://username:password@site
+    #
+    # If `site` parameter does not define scheme `http` will be used.
+    def format_url(site, username, password)
+      s = site.dup
+      if !s.start_with? 'http'
+        s = "http://#{s}"
+      end
+
+      u = URI.parse(s)
 
       <<-EOU.gsub(/\s+/, '').strip
-        #{u.scheme && u.scheme + '://'}
+        #{u.scheme + '://' if u.scheme}
         #{username}:#{password}@
-        #{u.host}:#{u.port}#{u.path}/
-        #{REST_API_SEARCH_URL}
+        #{u.host}:#{u.port}#{u.path}
       EOU
     end
 
