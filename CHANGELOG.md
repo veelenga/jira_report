@@ -1,3 +1,8 @@
+#x.x.x
+ * Now user can pass url with `http` or `https` prefixes.
+ * Now port and path are correctly resolved in url.
+ * `jira-report` cli becomes more user friendly.
+
 #0.1.3
  * Fixed error when configuration file not exist.
  * Now version is properly printed.

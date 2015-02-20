@@ -2,7 +2,19 @@ require 'spec_helper'
 
 module JiraReport
   describe JiraReport do
-    let(:jrep) { Reporter.new('url', 'admin', '*****') }
+    let(:jrep) { Reporter.new('site', 'admin', '*****') }
+
+    describe '#new' do
+      it 'raises error if site is nil' do
+        expect{ Reporter.new(nil, '1', '2') }.to raise_error RuntimeError
+      end
+      it 'raises error if usr is nil' do
+        expect{ Reporter.new('mysite', nil, '2') }.to raise_error RuntimeError
+      end
+      it 'raises error if pas is nil' do
+        expect{ Reporter.new('mysite', 'usr', nil) }.to raise_error RuntimeError
+      end
+    end
 
     describe '#query_issues' do
       it 'should throw exception' do
@@ -16,29 +28,54 @@ module JiraReport
     end
 
     describe '#jira_api_url' do
-      def jira_api_url(url=nil, user=nil, pass=nil)
-        jrep.send(:jira_api_url, url, user, pass)
+      def jira_api_url(site=nil, user=nil, pass=nil)
+        jrep.send(:jira_api_url, site, user, pass)
       end
 
-      it 'is an http url' do
-        url = jira_api_url
-        expect(url).not_to be nil
-        expect(url).to start_with 'http'
+      it 'ends with jira rest api search url' do
+        expect(jira_api_url 'url', 'usr', 'pas').
+          to end_with Reporter::REST_API_SEARCH_URL
       end
 
-      it 'uses rest api' do
-        expect(jira_api_url).to include('rest/api/2/search')
+      describe 'scheme' do
+        ['http', 'https'].each do |s|
+          it 'correctly detects scheme' do
+            site = "jira.mycom.com"
+            url = jira_api_url("#{s}://#{site}")
+            expect(url).to start_with "#{s}://"
+            expect(url).to include site
+          end
+        end
+
+        it 'is ok when no scheme passed' do
+          site = 'jira.mycom.com'
+          expect(jira_api_url(site)).to include site
+        end
       end
 
-      context 'when we use url, username and password' do
-        let(:usr) { 'admin_username' }
-        let(:url) { 'jira.mycompany.url' }
-        let(:pas) { '*****' }
-        it 'contains url, username and password' do
-          url = jira_api_url(url, usr, pas)
-          expect(url).to include(url)
-          expect(url).to include(usr)
-          expect(url).to include(pas)
+      context 'when we define all parameters' do
+        let(:usr)    { 'admin_username' }
+        let(:pas)    { 'password' }
+        let(:host)   { 'localhost' }
+        let(:port)   {  8000 }
+        let(:path)   { 'myjira' }
+
+        def expected_url(prefix)
+          "#{prefix}#{usr}:#{pas}@#{host}:#{port}/#{path}/#{Reporter::REST_API_SEARCH_URL}"
+        end
+
+        ['http://', 'https://'].each do |prefix|
+          it "correctly prepares #{prefix} url" do
+            site = "#{prefix}#{host}:#{port}/#{path}"
+            url = jira_api_url(site, usr, pas)
+            expect(url).to eq ( expected_url prefix )
+          end
+        end
+
+        it 'correctly prepares url without scheme' do
+          site = "#{host}:#{port}/#{path}"
+          url = jira_api_url(site, usr, pas)
+          expect(url).to eq ( expected_url 'http://' )
         end
       end
     end
@@ -177,5 +214,4 @@ module JiraReport
       end
     end
   end
-
 end
