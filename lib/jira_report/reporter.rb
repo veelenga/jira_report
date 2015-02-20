@@ -20,6 +20,8 @@ module JiraReport
   #   # from two weeks ago and ending one week ago.
   #   reopened = reporter.reopened('usr', '-2w', '-1w')
   class Reporter
+    REST_API_SEARCH_URL = 'rest/api/2/search?'
+
     # Initializes reporter.
     #
     # ==== Attributes
@@ -90,9 +92,16 @@ module JiraReport
 
     private
 
-    # Returns jira rest api search url.
-    def jira_api_url(url, username, password)
-      "http://#{username}:#{password}@#{url}/rest/api/2/search?"
+    # Returns jira rest api search url in next format
+    def jira_api_url(site, username, password)
+      u = URI.parse(site)
+
+      <<-EOU.gsub(/\s+/, '').strip
+        #{u.scheme && u.scheme + '://'}
+        #{username}:#{password}@
+        #{u.host}:#{u.port}#{u.path}/
+        #{REST_API_SEARCH_URL}
+      EOU
     end
 
     # Prepares jql query based on parameters to
