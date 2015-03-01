@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Jira report by veelenga</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/veelenga/jira_report">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/veelenga/jira_report/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/veelenga/jira_report/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Jira report</h1>
+          <p>Cli tool that prints jira activity report. </p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/veelenga">veelenga</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a id="jira-report--" class="anchor" href="#jira-report--" aria-hidden="true"><span class="octicon octicon-link"></span></a>Jira Report <a href="https://rubygems.org/gems/jira_report"><img src="https://badge.fury.io/rb/jira_report.svg" alt="Gem Version"></a> <a href="https://travis-ci.org/veelenga/jira_report"><img src="https://api.travis-ci.org/veelenga/jira_report.svg" alt="Build Status"></a>
+</h1>
+
+<p>Queries user activities from jira for specified period of time and prints it to console.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<pre><code>$ gem install jira_report
+</code></pre>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Just run it. <code>jira-report</code> will ask your jira site address, who you are and what's your password:</p>
+
+<pre><code>$ jira-report
+Jira site address: https://jira.company.com
+Username for 'https://jira.company.com': admin
+Password for 'https://jira.company.com':
+Connecting to 'https://jira.company.com'. Pls wait...
+
+What was [admin] doing:
+
+Created: 2
+  WFM-7180 - Provide static context for log property in BasicHashAnalyzer
+  TST-5862 - Unable to install Nginx on HP-UX with Java 6
+
+Resolved: 8
+  GSM-364 - Migration of existing scenario
+  WFM-5865 - NullPointerException while finding categories
+  TST-5864 - Some NGinx installation improvements
+  TST-5863 - NGinx minimal dependency
+  SDK-7139 - Move common interfaces and classes from into individual jar
+  SDK-7138 - Move common interfaces and classes from into individual dll
+  TST-7111 - Event.getDonotNotify doesn't indicate about agent's state
+  TST-6985 - TST classes should have static Log fields
+
+Reopened: 0
+
+Closed: 5
+  TST-6943 - Remove redundant org.apache.log4j dependency from common part
+  TST-5862 - Unable to install NGinx on HP-UX with Java 6
+  TST-5857 - Put back support for Jdk 1.6
+  TST-5840 - NGinx fails to handle interaction initiated
+  GSM-364 -  Migration of existing units
+</code></pre>
+
+<p><code>url</code>, <code>username</code>, <code>password</code> and some other parameters can be added to <a href="#configuration">configuration file</a>. Also you can use mixed approach (keep some options in file, others enter from command line). For example if you do not want to keep password in configuration file, just don't, you will be asked.</p>
+
+<p>Also you can use it directly in ruby code:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="pl-k">require</span> <span class="pl-s1"><span class="pl-pds">'</span>jira_report<span class="pl-pds">'</span></span>
+
+<span class="pl-k">def</span> <span class="pl-en">print_issues</span>(<span class="pl-vpf">issues</span>)
+  issues.each <span class="pl-k">do </span>|<span class="pl-vo">issue</span>|
+    puts <span class="pl-s1"><span class="pl-pds">"</span>  <span class="pl-pse">#{</span><span class="pl-s2">issue[<span class="pl-s1"><span class="pl-pds">'</span>key<span class="pl-pds">'</span></span>]</span><span class="pl-pse"><span class="pl-s2">}</span></span> - <span class="pl-pse">#{</span><span class="pl-s2">issue[<span class="pl-s1"><span class="pl-pds">'</span>fields<span class="pl-pds">'</span></span>][<span class="pl-s1"><span class="pl-pds">'</span>summary<span class="pl-pds">'</span></span>]</span><span class="pl-pse"><span class="pl-s2">}</span></span><span class="pl-pds">"</span></span>
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span>
+
+reporter <span class="pl-k">=</span> <span class="pl-s3">JiraReport</span>::<span class="pl-s3">Reporter</span>.<span class="pl-k">new</span>(<span class="pl-s1"><span class="pl-pds">'</span>jira.company.com<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>admin<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>s3cr3t<span class="pl-pds">'</span></span>)
+<span class="pl-c"># returns all created issues by 'my_jira_name'</span>
+all_created <span class="pl-k">=</span> reporter.created(<span class="pl-s1"><span class="pl-pds">'</span>my_jira_name<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># returns closed issues by 'admin' last week</span>
+weekly_closed <span class="pl-k">=</span> reporter.closed(<span class="pl-s1"><span class="pl-pds">'</span>admin<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>-1w<span class="pl-pds">'</span></span>)
+
+<span class="pl-c"># returns reopened issues by 'usr' in period starting</span>
+<span class="pl-c"># from two weeks ago and ending one week ago.</span>
+reopened <span class="pl-k">=</span> reporter.reopened(<span class="pl-s1"><span class="pl-pds">'</span>usr<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>-2w<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>-1w<span class="pl-pds">'</span></span>)
+
+print_issues(weekly_closed)</pre></div>
+
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>Path to configuration file can be specified by <code>-c</code> command line argument. <code>~/.jira-report</code> is default.</p>
+
+<p>There are three main options in config file to query jira:</p>
+
+<pre><code>url=jira.company.com
+username=username
+password=s3cr3t
+</code></pre>
+
+<p>You may pass all those options (or some of them) in command line mode.</p>
+
+<p>Period is set by two options <code>period_from</code> and <code>period_till</code>. Both options support <a href="https://confluence.atlassian.com/display/JIRA/Advanced+Searching">advanced jira searching</a> and accept dates, jira functions, aliasing. For example:</p>
+
+<pre><code>period_from=-1w
+period_till=now()
+</code></pre>
+
+<p>If those options not specified in configuration file, last week activities will be queried (just as in example above).</p>
+
+<p>You can look at configuration file <a href="example/jira-report.sample">sample</a> in repository.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
