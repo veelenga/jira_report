@@ -1,4 +1,4 @@
-#x.x.x
+#0.1.4
  * Now user can pass url with `http` or `https` prefixes.
  * Now port and path are correctly resolved in url.
  * `jira-report` cli becomes more user friendly.
