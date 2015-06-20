@@ -93,4 +93,4 @@ period_till=now()
 
 If those options not specified in configuration file, last week activities will be queried (just as in example above).
 
-You can look at configuration file [sample](example/jira-report.sample) in repository.
+You can look at configuration file [sample](https://github.com/veelenga/jira_report/blob/master/example/jira-report.sample) in repository.
